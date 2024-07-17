@@ -785,21 +785,29 @@ int decodeModesMessage(struct modesMessage *mm) {
     }
 
     // these are messages of general bad quality, treat them as garbage when garbage_ports is in use.
-    if ((Modes.netIngest || Modes.garbage_ports) && mm->remote && mm->timestamp == 0 && mm->msgtype != 18) {
-        mm->garbage = 1;
-        mm->source = SOURCE_SBS;
-        if (mm->addrtype >= ADDR_OTHER)
-            mm->addrtype = ADDR_OTHER;
-    }
-    // ignore DF18 from this hexrange, bogus hexes set
-    // i'd like to not have such exceptions in this source but rather configure them some other way
-    // for the time being still gonna do it this way
-    if (mm->remote && mm->msgtype == 18 && mm->addr >= 0x899000 && mm->addr < 0x899200 && Modes.garbage_ports) {
-        mm->garbage = 1;
-    }
+if ((Modes.netIngest || Modes.garbage_ports) && mm->remote && mm->timestamp == 0 && mm->msgtype != 18) {
+    mm->garbage = 1;
+    mm->source = SOURCE_SBS;
+    if (mm->addrtype >= ADDR_OTHER)
+        mm->addrtype = ADDR_OTHER;
+}
 
-    // all done
-    return mm->decodeResult;
+// MLAT should not override OTHER data
+if (mm->remote && mm->timestamp == MAGIC_MLAT_TIMESTAMP && mm->addrtype != ADDR_OTHER) {
+    mm->source = SOURCE_MLAT;
+    mm->addrtype = ADDR_MLAT;
+}
+
+// ignore DF18 from this hexrange, bogus hexes set
+// i'd like to not have such exceptions in this source but rather configure them some other way
+// for the time being still gonna do it this way
+if (mm->remote && mm->msgtype == 18 && mm->addr >= 0x899000 && mm->addr < 0x899200 && Modes.garbage_ports) {
+    mm->garbage = 1;
+}
+
+// all done
+return mm->decodeResult;
+
 }
 #undef decode_return
 
