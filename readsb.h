@@ -183,8 +183,8 @@ typedef enum
     ADDR_TISB_ICAO = 3, /* TIS-B, ICAO address */
 
     ADDR_JAERO = 4,
-    ADDR_MLAT = 5,
-    ADDR_OTHER = 6,
+    ADDR_MLAT = 6,
+    ADDR_OTHER = 5,
     ADDR_MODE_S = 7,
 
     ADDR_ADSB_OTHER = 8, /* ADS-B, other address format */
